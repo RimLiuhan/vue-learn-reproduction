@@ -7,7 +7,8 @@
                     <div class="username">{{user.username}}</div>
                     <div class="fans">粉丝数: {{user.followerCount}}</div>
                     <div>
-                        <button type="button" class="btn btn-success btn-sm">+关注</button>
+                        <button @click="follow" v-if="!user.is_followed" type="button" class="btn btn-success btn-sm">+关注 </button>
+                        <button @click="unfollow"  v-if="user.is_followed" type="button" class="btn btn-success btn-sm">取消关注</button>
                     </div>
                 </div>
             </div>
@@ -16,12 +17,60 @@
 </template>
 
 <script>
+import $ from 'jquery';
+import { useStore } from 'vuex';
+
 export default {
     name: "UserProfileInfo",
     props: {
         user: {
             type: Object,
             required: true
+        }
+    },
+    setup(props, context)  {
+        const store = useStore();
+        const follow = () => {
+            $.ajax({
+                url: "https://app165.acapp.acwing.com.cn/myspace/follow/",
+                type: "POST",
+                data: {
+                    target_id: props.user.id
+                },
+                headers: {
+                    'Authorization': "Bearer " + store.state.user.access,
+                },
+                success(resp) {
+                    if (resp.result === "success") {
+                        console.log("关注");
+                        context.emit("followEvent");
+                    }
+                }
+            })
+        };
+
+        const unfollow = () => {
+            $.ajax({
+                url: "https://app165.acapp.acwing.com.cn/myspace/follow/",
+                type: "POST",
+                data: {
+                    target_id: props.user.id
+                },
+                headers: {
+                    'Authorization': "Bearer " + store.state.user.access,
+                },
+                success(resp) {
+                    if (resp.result === "success") {
+                        console.log("取消关注");
+                        context.emit("unfollowEvent");
+                    }
+                }
+            })
+        };
+
+        return {
+            follow,
+            unfollow
         }
     }
 }
