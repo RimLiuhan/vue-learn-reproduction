@@ -1,6 +1,6 @@
 <template>
     <ContentBase>
-        <div class="card" v-for="user in users" :key="user.id">
+        <div class="card" v-for="user in users" :key="user.id" @click="open_user_profile(user.id)">
             <div class="card-body">
                 <div class="row">
                     <div class="col-1">
@@ -20,12 +20,15 @@
 import ContentBase from '@/components/ContentBase.vue';
 import $ from 'jquery';
 import {ref} from 'vue';
+import { useStore } from 'vuex';
+import router from '@/router';
 
 export default {
     components: { ContentBase },
     name: "UserList",
 
     setup() {
+        const store = useStore();
         let users = ref([]);
         $.ajax({
             url: "https://app165.acapp.acwing.com.cn/myspace/userlist/",
@@ -34,8 +37,25 @@ export default {
                 users.value = resp;
             }
         });
+
+        const open_user_profile = userId => {
+            if (store.state.user.is_login) {
+                router.push({
+                    name: "userprofile",
+                    params: {
+                        userId
+                    }
+                })
+            } else {
+                router.push({
+                    name: "login"
+                })
+            }
+        };
+
         return {
-            users
+            users,
+            open_user_profile
         }
     }
 }

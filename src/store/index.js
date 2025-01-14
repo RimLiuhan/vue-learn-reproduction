@@ -11,6 +11,6 @@ export default createStore({
   actions: {
   },
   modules: {
-    ModuleUser
+    user: ModuleUser
   }
 })
